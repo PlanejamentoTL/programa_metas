@@ -1,22 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-
+import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [menuAberto, setMenuAberto] = useState(false);
   const menuRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setMenuAberto(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleMenuToggle = () => {
     setMenuAberto((prev) => !prev);
@@ -27,40 +14,42 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[var(--color-navy)] nav-bar-flex h-36 z-[7] relative">
-      
+    <nav className="bg-white shadow-md fixed w-full z-10 px-6 py-4">
+      <div className="flex items-center justify-between max-w-7xl mx-auto">
+        <Link to="/" className="text-xl font-bold text-gray-800">
+          MeuProjeto
+        </Link>
 
-      {/* Botão para abrir/fechar menu - Somente Mobile */}
-      <button
-        className={`md:hidden text-white text-3xl transition-all duration-300 ${menuAberto ? "rotate-90" : ""}`}
-        onClick={handleMenuToggle}
-      >
-        {menuAberto ? "×" : "☰"}
-      </button>
+        {/* Botão para mobile */}
+        <button
+          className="md:hidden text-gray-800 text-3xl"
+          onClick={handleMenuToggle}
+        >
+          {menuAberto ? "×" : "☰"}
+        </button>
 
-      {/* Menu de Navegação */}
-      <div
-        ref={menuRef}
-        className={`absolute top-16 left-0 w-full bg-[var(--color-navy)] p-4 flex flex-col gap-12 text-white text-3xl uppercase 
-        md:relative md:flex md:flex-row md:top-0 md:w-auto md:bg-transparent md:p-0 navbar-mobile transition-all duration-300 
-        ${menuAberto ? "opacity-100 visible" : "opacity-0 invisible md:opacity-100 md:visible"}`}
-      >
-        <a href="#sobre" className="font-bold text-white" onClick={handleLinkClick}>
-          Sobre o Programa
-        </a>
-        <a href="#audiencias" className="font-bold text-white" onClick={handleLinkClick}>
-          Contribuições para o PdM
-        </a>
-        <a href="#programas" className="font-bold text-white" onClick={handleLinkClick}>
-          Programas Anteriores
-        </a>
-
-        {/* Logo Prefeitura - Somente Mobile */}
-       
+        {/* Menu */}
+        <div
+          ref={menuRef}
+          className={`absolute top-20 left-0 w-full bg-white p-6 flex flex-col gap-4 text-lg
+          md:relative md:flex md:flex-row md:top-0 md:w-auto md:bg-transparent md:p-0 md:gap-6 
+          transition-all duration-300 
+          ${menuAberto ? "block" : "hidden"} md:block`}
+        >
+          <Link to="/" onClick={handleLinkClick} className="text-gray-700 hover:text-blue-600 font-medium">
+            Início
+          </Link>
+          <Link to="/sobre" onClick={handleLinkClick} className="text-gray-700 hover:text-blue-600 font-medium">
+            Sobre
+          </Link>
+          <Link to="/servicos" onClick={handleLinkClick} className="text-gray-700 hover:text-blue-600 font-medium">
+            Serviços
+          </Link>
+          <Link to="/contato" onClick={handleLinkClick} className="text-gray-700 hover:text-blue-600 font-medium">
+            Contato
+          </Link>
+        </div>
       </div>
-
-      {/* Logo Prefeitura - Somente Desktop */}
-     
     </nav>
   );
 };
