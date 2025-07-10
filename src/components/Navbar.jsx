@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import logo from "../assets/programa_metas_branco.png";
-import logo_prefeitura from "../assets/LOGO_prefeitura.png";
+
 
 const Navbar = () => {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -29,9 +28,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-[var(--color-navy)] nav-bar-flex h-36 z-[7] relative">
-      <div className="flex items-center gap-4 w-60 h-full">
-        <img src={logo} alt="Logo PDM" className="w-70 h-auto" />
-      </div>
+      
 
       {/* Botão para abrir/fechar menu - Somente Mobile */}
       <button
@@ -59,15 +56,11 @@ const Navbar = () => {
         </a>
 
         {/* Logo Prefeitura - Somente Mobile */}
-        <div className="flex justify-center items-center mt-8 md:hidden">
-          <img src={logo_prefeitura} alt="Logo da Prefeitura" className="h-16 w-auto" />
-        </div>
+       
       </div>
 
       {/* Logo Prefeitura - Somente Desktop */}
-      <div className="hidden md:flex items-center gap-4 w-40 ml-auto">
-        <img src={logo_prefeitura} alt="Logo da Prefeitura" className="h-auto w-60" />
-      </div>
+     
     </nav>
   );
 };
