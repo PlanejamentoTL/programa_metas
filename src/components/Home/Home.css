@@ -1,0 +1,59 @@
+.div_img-fundo{
+
+
+    width: 100vw;
+  height: 90vh;
+     
+   
+}
+
+.img-fundo {
+  
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.conteudo_sobre_imagem{
+
+    position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  
+  width: 100%;
+
+
+  
+}
+
+.logo_central{
+
+    width: 400px;
+    height: auto;
+}
+
+.botoes{
+
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    gap: 40rem;
+   
+}
+
+.botao{
+
+    background-color: white;
+    color: blue;
+    width: 300px;
+    height: 60px;
+   
+
+}

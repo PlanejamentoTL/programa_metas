@@ -1,17 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "../src/components/Navbar";
-import Home from "../src/components/Home";
-
-// outros imports...
+import Navbar from "./components/Navbar/Navbar";
+import Home from "./components/Home/Home";
+import TabelaEGrafico from "./components/GrapicsBento/GrapicsBento";
 
 function App() {
   return (
     <Router>
       <Navbar />
-      <div className="pt-20"> {/* padding para compensar navbar fixa */}
+
+      <div className="pt-20">
         <Routes>
-          <Route path="/" element={<Home />} />
-          {/* demais rotas */}
+          {/* Página principal com Home + TabelaEGrafico */}
+          <Route
+            path="/"
+            element={
+              <>
+                <Home />
+                <TabelaEGrafico />
+              </>
+            }
+          />
         </Routes>
       </div>
     </Router>

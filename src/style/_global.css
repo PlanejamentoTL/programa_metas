@@ -1,4 +1,4 @@
-@import "../components/Navbar/Navbar.css";
+@import "../components/Navbar.css";
 @import "../components/Footer/footer.css";
 @import "./_animations.css";
 @import "./_button.css";
@@ -45,7 +45,7 @@ p,a,q,li {
 a, li {
     margin: 0;
     padding: 0;
-    color: var(--color-black);
+   
     text-decoration: none;
     list-style-type: none;
 }
