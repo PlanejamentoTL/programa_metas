@@ -5,12 +5,10 @@ import TabelaEGrafico from "./components/GrapicsBento/GrapicsBento";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/programa_metas">
       <Navbar />
-
       <div className="pt-20">
         <Routes>
-          {/* Página principal com Home + TabelaEGrafico */}
           <Route
             path="/"
             element={
