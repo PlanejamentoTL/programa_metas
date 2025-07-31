@@ -7,6 +7,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { IoDocumentSharp } from "react-icons/io5";
+
 
 import "./GrapicsBento.css";
 import { color } from "chart.js/helpers";
@@ -66,26 +68,28 @@ function TabelaEGrafico() {
 
   const labels = Object.keys(contagem);
   const values = Object.values(contagem);
-  const cores = [
-    '#4CAF50',
-    '#0060a3',
-    '#ffff00',
-    '#ea4335',
-    '#F2F2F2',
-  ];
-
-  const chartDataObj = {
-    labels,
-    datasets: [
-      {
-        label: 'Distribuição por Status',
-        data: values,
-        backgroundColor: cores.slice(0, labels.length),
-        hoverOffset: 4,
-        cutout: 120,
-      },
-    ],
+  const cores = {
+   "Concluída": "#4CAF50",
+    "Em partes": "#0060a3",
+    "Planejada": "#ffff00",
+    "Não contemplada": "#ea4335",
+    "Sem dados": "#F2F2F2",
+    "Outro": "#999999"
   };
+
+const chartDataObj = {
+  labels,
+  datasets: [
+    {
+      label: 'Distribuição por Status',
+      data: values,
+      backgroundColor: labels.map(label => cores[label] || cores["Outro"]),
+      hoverOffset: 4,
+      cutout: 120,
+    },
+  ],
+};
+
 
   const secretarias = Array.from(new Set(dados.map(d => d.Secretaria).filter(Boolean)));
   const planos = Array.from(new Set(dados.map(d => d.Plano).filter(Boolean)));
@@ -172,9 +176,11 @@ function TabelaEGrafico() {
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <div><strong>Nº:</strong> {meta.Numero}</div>
                 <div><strong>Status:</strong> {meta.Status}</div>
+                
               </div>
               <div><strong>Descrição:</strong> {meta.Meta}</div>
               <div><strong>Secretaria:</strong> {meta.Secretaria}</div>
+               <div><strong>Conclusão:</strong> {meta.Data_conclusão}</div>
               {linhaAberta === i && (
                 <div style={{ marginTop: "10px", background: "#f4f4f4", padding: "10px", borderRadius: "4px" }}>
                   <strong>Detalhamento:</strong> {meta.Detalhamento || "Não informado"}
@@ -189,27 +195,27 @@ function TabelaEGrafico() {
 
         <h2>Relatórios Semestrais</h2>
         <div className="relatorios">
-            <button className="botoes_relatorios" > 2025</button>
-            <button className="botoes_relatorios">2025 </button>
-            <button className="botoes_relatorios"> 2025</button>
-            <button className="botoes_relatorios" > 2025</button>
+            <button className="botoes_relatorios" ><IoDocumentSharp /> 2025</button>
+            <button className="botoes_relatorios"> <IoDocumentSharp />2026 </button>
+            <button className="botoes_relatorios"> <IoDocumentSharp /> 2027</button>
+            <button className="botoes_relatorios" ><IoDocumentSharp />  2028</button>
         </div>
       </div>
 
        <div className="div_relatorios">
 
-        <h2>Relatórios Semestrais</h2>
+        <h2>"Instrumentos de Planejamento</h2>
         <div className="relatorios">
-            <button className="botoes_relatorios" > 2025</button>
-            <button className="botoes_relatorios">2025 </button>
-            <button className="botoes_relatorios"> 2025</button>
-            <button className="botoes_relatorios" > 2025</button>
+            <button className="botoes_relatorios" ><IoDocumentSharp />  2025</button>
+            <button className="botoes_relatorios"> <IoDocumentSharp />2025 </button>
+            <button className="botoes_relatorios"> <IoDocumentSharp /> 2025</button>
+            <button className="botoes_relatorios" > <IoDocumentSharp /> 2025</button>
         </div>
          <div className="relatorios">
-            <button className="botoes_relatorios" > 2025</button>
-            <button className="botoes_relatorios">2025 </button>
-            <button className="botoes_relatorios"> 2025</button>
-            <button className="botoes_relatorios" > 2025</button>
+            <button className="botoes_relatorios" >  <IoDocumentSharp /> 2025</button>
+            <button className="botoes_relatorios"> <IoDocumentSharp /> 2025 </button>
+            <button className="botoes_relatorios"> <IoDocumentSharp /> 2025</button>
+            <button className="botoes_relatorios" > <IoDocumentSharp /> 2025</button>
         </div>
       </div>
     </>

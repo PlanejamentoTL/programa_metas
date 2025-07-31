@@ -16,15 +16,17 @@
 
 .bento-grid {
   display: grid;
-  grid-template-columns: repeat(6, 200px);
+  grid-template-columns: repeat(6, 1fr); /* Colunas flexíveis */
   grid-template-rows: 200px 200px;
   gap: 1em;
   grid-template-areas:
     "box-1 box-1 box-1 box-2 box-3 box-4"
     "box-1 box-1 box-1 box-5 box-5 box-6";
- 
-    margin: 20px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
 }
+
 
 .bento-card {
   background: white;
@@ -72,6 +74,7 @@
   border: 1px solid #000;
   border-radius: 5px;
   font-size: 1rem;
+  color: #000;
 }
 
 .relatorios{

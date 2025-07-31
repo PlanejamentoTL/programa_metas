@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [react()],
   base: '/programa_metas/', 
   build: {
-    outDir: 'dist'
+    outDir: 'docs'
   }
 })
