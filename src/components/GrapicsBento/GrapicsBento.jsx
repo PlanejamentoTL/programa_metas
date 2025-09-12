@@ -481,7 +481,7 @@ const opcoesLinha = {
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1SPJLBA-AT5oF12YzE-YJjH5Zh72Kr_33/preview")}> <LiaHatCowboySideSolid className="icones_secretarias" />  <br/>Agronegócio </button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1C69ud1Rf42gKQK6TG6O4NazXL_Oz_Xzd/preview")}> <FaHandsHelping className="icones_secretarias" /> <br/> Assistência Social</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1xH-D1YmFFrXYWHQ6kUddZmtG3APkD6ax/preview")}><FaTheaterMasks className="icones_secretarias" /> <br/> Cultura</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1tazA6kyOnNRWud0-E9tgEcV-72i6oTeG/preview")}> <IoTrendingUpOutline className="icones_secretarias" /> <br/>Desenvolvimento Econômico</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1tazA6kyOnNRWud0-E9tgEcV-72i6oTeG/preview")}> <IoTrendingUpOutline className="icones_secretarias" /> <br/>Desenv. Econômico</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1kIBza8h86GjIK29ABb4e4R1T3NstwyoA/preview")}> <IoSchoolOutline className="icones_secretarias" /> <br/> Educação</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/17GEWy61JXAJcFaFbEzIuxV16m80dJS4u/preview")}><RiMoneyDollarCircleLine className="icones_secretarias" /> <br/>  Finanças</button>
 
