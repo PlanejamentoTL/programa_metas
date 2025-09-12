@@ -1,16 +1,15 @@
 .nav-bar-flex{
     display: flex ;
-    flex-wrap: nowrap ;
+   
     flex-direction: row ;
     justify-content: space-between ;
     
     align-items: center ;
-    position: fixed;
-    top:0;
     width: 100%;
     padding: 0.5rem 2.5rem;
     background-color: #1641A2;
     margin-top: 0;
+     position: fixed;
 }
 
 .logo_programa_metas {

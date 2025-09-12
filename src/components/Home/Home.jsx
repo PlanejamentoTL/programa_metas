@@ -4,6 +4,7 @@ import './Home.css';
 import foto_paco from "../../assets/comite.jpeg";
 import logo_programa_metas from "../../assets/programa_metas_branco.png"
 import videoTL from "../../assets/video_treslagoas.mp4";
+import logo_prefeitura from "../../assets/LOGO_prefeitura.png";
 
 const Home = () => {
   const [showModal, setShowModal] = useState(false);
@@ -11,8 +12,10 @@ const Home = () => {
   
   return (
     <main>
+
+
       <div className="div_img-fundo"> 
-        <video src={videoTL} autoPlay muted loop className="img-fundo"></video>
+        <video src={videoTL} autoPlay muted loop     playsInline className="img-fundo"></video>
 
         <div className="conteudo_sobre_imagem">
           <img src={logo_programa_metas} alt="logo programa de metas" className="logo_central"/>
@@ -20,19 +23,19 @@ const Home = () => {
           <div className="botoes">
             <button className="botao" onClick={() => setShowModal(true)}>Sobre o Programa de Metas</button>
           <button
-  className="botao"
-  onClick={() => {
-    const relatorios = document.getElementById("secao-relatorios");
-    if (relatorios) {
-      relatorios.scrollIntoView({ behavior: "smooth" });
-    }
-  }}
+          className="botao" onClick={() => { const relatorios = document.getElementById("secao-relatorios");
+                if (relatorios) {
+                     relatorios.scrollIntoView({ behavior: "smooth" });
+                         }
+                        }}
 >
   Relatórios
 </button>
           </div>
         </div>
       </div>
+
+
 
       {showModal && (
         <div className="modal-overlay">

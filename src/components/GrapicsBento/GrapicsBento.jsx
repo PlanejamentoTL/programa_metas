@@ -64,11 +64,13 @@ function TabelaEGrafico() {
   const [dados_financeiros, setDados_financeiros] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [filtroSecretaria, setFiltroSecretaria] = useState("Todos");
+
   
  
   const [filtroPlano, setFiltroPlano] = useState("Plano de Governo");
   const [linhaAberta, setLinhaAberta] = useState(null);
   const [filtroTipo, setFiltroTipo] = useState("Geral");
+    const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetch(url)
@@ -145,7 +147,7 @@ const chartDataObj = {
       data: values,
       backgroundColor: labels.map(label => cores[label] || cores["Outro"]),
       hoverOffset: 4,
-      cutout: 120,
+      cutout: 100,
     },
   ],
 };
@@ -252,12 +254,13 @@ const opcoesLinha = {
   return (
     <>
 
-
-    
-          <div className="bar-flex" > <h3>Painel de Monitoramento - Programa de Metas</h3> </div>
        
-
+  
+     
+     
+   <div className="bar-flex_painel" > <h3>Painel de Monitoramento</h3> </div>
         <div className="conteudo">
+         
 
       <div className="filtros_div">
         <label  >
@@ -291,7 +294,7 @@ const opcoesLinha = {
           </div>
         </div>
 
-        <div className="bento-card" style={{ gridArea: "box-2" }}>
+          <div className="bento-card" style={{ gridArea: "box-2" }}>
           <h4 className="contador_titulo">Total de Metas</h4>
           <p className="contador">{dadosFiltrados.length}</p>
         </div>
@@ -301,7 +304,7 @@ const opcoesLinha = {
           <p className="contador">{contadores["Concluída"]}</p>
         </div>
 
-        <div className="bento-card" style={{ gridArea: "box-4" }}>
+         <div className="bento-card" style={{ gridArea: "box-4" }}>
           <h4 className="contador_titulo">Em Partes</h4>
           <p className="contador">{contadores["Em partes"]}</p>
         </div>
@@ -315,6 +318,7 @@ const opcoesLinha = {
           <h4 className="contador_titulo">Não contempladas</h4>
           <p className="contador">{contadores["Não contemplada"]}</p>
         </div>
+
       </div>
 
       <div style={{ marginTop: "2rem", padding: "1rem" }}>
@@ -346,7 +350,7 @@ const opcoesLinha = {
                 
               </div>
 
-               <div style={{ marginTop: "1%",  display: "flex", justifyContent: "space-between" }}>
+               <div className="infos_meta" >
              <div className="descricao"  ><strong>Descrição:</strong> {meta.Plano === "Plano de Governo" ? meta.Objetivo : meta.Meta}</div>
                
              <div style={{marginRight: "5px"}} ><strong>ODS Vinculados:</strong> {meta.ODS}</div>
@@ -376,7 +380,7 @@ const opcoesLinha = {
      
        <div className="filtros_div">
      <label>
-  Filtrar por Secretaria:
+  Filtrar p/ Secretaria:
   <br/>
   <select className="filtros" value={filtroSecretaria} onChange={e => setFiltroSecretaria(e.target.value)}>
     <option value="Todos">Todos</option>
@@ -450,12 +454,12 @@ const opcoesLinha = {
         }}
         onClick={() => toggleLinha(i)}
       >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div className="infos_meta">
           <div><strong>Ano:</strong> {item.Ano}</div>
           <div><strong>Tipo:</strong> {item.Tipo}</div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px" }}>
+        <div className="infos_meta" >
         <div><strong>Secretaria:</strong> {item.Secretaria}</div>
         <div><strong>Dotação Inicial:</strong> R$ {item.Dotacao_Inicial}</div>
         <div><strong>Dotação Final:</strong> R$ {item.Dotacao_Final}</div>
@@ -482,9 +486,9 @@ const opcoesLinha = {
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/17GEWy61JXAJcFaFbEzIuxV16m80dJS4u/preview")}><RiMoneyDollarCircleLine className="icones_secretarias" /> <br/>  Finanças</button>
 
             
-        </div>
+       
 
-        <div className="relatorios">
+     
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1-v5n3_EzW00xqWayb9wcpaLCay1yqKDp/preview")}> <RiGovernmentLine className="icones_secretarias"/><br/> Governo </button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1zmqOKpqaTd3zRR0_Dm8tiBRcBQqdaM73/preview")}> <BsHouses className="icones_secretarias" /> <br/> Habitação</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/19JQXJ46s1MBQcCSGJiM_3te27FfXZHG3/preview")}><CiDeliveryTruck className="icones_secretarias" /> <br/>  Infraestrutura</button>
@@ -521,8 +525,10 @@ const opcoesLinha = {
       <p>&copy; {new Date().getFullYear()} Prefeitura Municipal de Três Lagoas. Todos os direitos reservados.</p>
        <p>Departamento de Planejamento e Estatística.</p>
      </footer>
-         
+
+    
     </>
+
   );
 }
 

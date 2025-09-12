@@ -1,31 +1,52 @@
+
+
+
+
 .div_img-fundo{
 
-
   width: 100%;
+  height: 100%;
+ 
     
      
    
 }
 
+
 .img-fundo {
   
  
+z-index: 0;
+  object-fit: cover;
   width: 100%;
+  height: 85vh;
+  inset: 0;   
+  
+  
+
+
 
 }
 
 .conteudo_sobre_imagem{
 
-    position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+      position: absolute;     
+
+   
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2rem;
-  
+   background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0.35)
+  );
   width: 100%;
+  height: 85vh;
+  z-index: 1;
+  inset: 0;        
 
 
   
@@ -33,8 +54,8 @@
 
 .logo_central{
 
-    width: 400px;
-    height: auto;
+    width: 300px;
+  
 }
 
 .botoes{
@@ -43,7 +64,9 @@
     justify-content: center;
     width: 100%;
     display: flex;
-    gap: 40rem;
+    
+    
+
    
 }
 
@@ -51,8 +74,12 @@
 
     background-color: white;
     color: blue;
-    width: 300px;
-    height: 60px;
+    width: 500px;
+    height: 80px;
+    margin: 5%;
+    font-size: small;
+    font-weight: bold;
+    border-radius: 10px;
    
 
 }
@@ -104,3 +131,124 @@
   cursor: pointer;
   color: #000;
 }
+
+
+
+
+
+
+
+
+@media (min-width: 600px) {
+
+  
+  .logo_central{
+
+    width: 400px;
+  
+}
+
+  .botoes{
+
+   
+    gap: 40rem;
+   
+}
+
+.botao{
+
+  
+    height: 60px;
+
+}
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/*-----------------------------------------------------------*/
+
+.nav-bar-flex{
+    display: flex ;
+   
+    flex-direction: row ;
+    justify-content: space-between ;
+    
+    align-items: center ;
+    width: 100%;
+    padding: 0.5rem 2.5rem;
+    background-color: #1641A2;
+    margin-top: 0;
+    position: fixed;
+     z-index: 2;
+ 
+
+}
+
+
+
+
+.img-fundo {
+  
+ 
+
+  height: 90vh;
+
+  
+  
+
+
+
+}
+
+.conteudo_sobre_imagem{
+
+   
+  height: 90vh;
+     
+
+
+  
+}
+
+
+
+
+
+
+.text-white{
+    color: var(--color-white);
+}
+
+.list-navbar{
+    width: 44rem;
+    text-align: center;
+}
+
+@media screen and (max-width: 426px) and (min-width: 320px){
+    .navbar-mobile{
+        align-items: center ;
+        width: 100%;
+        margin: 5rem 0 0 0;
+        padding: 3rem;
+    }
+    .nav-bar-flex{
+        gap: 6rem;
+        padding: 1rem;
+        width: 100%;
+    }
+}
+
+
+
+
