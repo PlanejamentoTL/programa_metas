@@ -54,7 +54,7 @@ import { color } from "chart.js/helpers";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const url =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKKNMJxtxa0eo3er_xR6MEuoNtEj7m37GWatu6zyzgNhbQpb3E4eY6mmdmqORBVQHbmOhjYfyl7ZB/pub?gid=1952842445&single=true&output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKKNMJxtxa0eo3er_xR6MEuoNtEj7m37GWatu6zyzgNhbQpb3E4eY6mmdmqORBVQHbmOhjYfyl7ZB/pub?gid=270064734&single=true&output=csv";
 
 const url_financeiro = 
    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqIsZ9Y0T__qRR4h6k3q6m1B_D6By0MO49t3pBs7vwaUs2wbNljsxMmxQ_TwWGJQB0g8L81ZhTRljD/pub?gid=440817858&single=true&output=csv";
@@ -495,7 +495,30 @@ const opcoesLinha = {
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/14b4AyKBhYMAc1afkKhnsnEtEAB_C7pj-/preview")}> <FaLeaf className="icones_secretarias" /> <br/> Meio Ambiente </button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1I_X2FLDuM83DZyxb1olgwM7m7T1F4efU/preview")}> <MdHealthAndSafety className="icones_secretarias" /> <br/> Saúde</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1a2FlYr385ofTlQVXBb5gCmNu_w1mxoc5/preview")}><MdOutlineSportsVolleyball className="icones_secretarias" /> <br/>  Sejuvel</button>
-             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1MdKwHi-FMfqSaa9OMFxGAZ_E_XHwPr0F/preview")}><PiTrafficSign className="icones_secretarias" /> <br/>  Transporte</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1MdKwHi-FMfqSaa9OMFxGAZ_E_XHwPr0F/preview")}><PiTrafficSign className="icones_secretarias" /> <br/>  Transporte</button>
+        </div>
+
+         <h2>Relatórios 2º Semestre</h2>
+        <div className="relatorios">
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1ibd3rfvalq4j4VPuB-AWBr-gAYlUBlgR/preview")} ><IoBusinessOutline className="icones_secretarias" /> <br/> Gestão e Inovação</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1-UVZun4GClu5mbtikb0SuPz9Zv6gp94T/preview")}> <LiaHatCowboySideSolid className="icones_secretarias" />  <br/>Agronegócio </button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1bU8qSCnMnhoG19NdmRPRhgbdP3KCtmCY/preview")}> <FaHandsHelping className="icones_secretarias" /> <br/> Assistência Social</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1ZE4mYS0kVEigAPiktlMN6jUeGM7wV6Mn/preview")}><FaTheaterMasks className="icones_secretarias" /> <br/> Cultura</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1Gg0MATppxBiumnyTnApRSdcB2Ddq5rdL/preview")}> <IoTrendingUpOutline className="icones_secretarias" /> <br/>Desenv. Econômico</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1-r7IIsVIP87_fcVnHaoKfDMpsU7sWoUh/preview")}> <IoSchoolOutline className="icones_secretarias" /> <br/> Educação</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/19jGcc_7BKhHDsVOk0FRnRkwRLWQ1eqj_/preview")}><RiMoneyDollarCircleLine className="icones_secretarias" /> <br/>  Finanças</button>
+
+            
+       
+
+     
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1k-vVAwSIRh7LIT438Sv101TiHdCAv--0/preview")}> <RiGovernmentLine className="icones_secretarias"/><br/> Governo </button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/13S9_Ih1ByPe2VC20FEXbc0_BQr917D2d/preview")}> <BsHouses className="icones_secretarias" /> <br/> Habitação</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1ngGxw4xSB8ZAM5avy2OVUlLjNTVC8KsC/preview")}><CiDeliveryTruck className="icones_secretarias" /> <br/>  Infraestrutura</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1RRjYRqjqYQFQdMb1Y0V-zOKY10ha3WgV/preview")}> <FaLeaf className="icones_secretarias" /> <br/> Meio Ambiente </button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1Z3qFFpKLRHdXIYdnJwwESQEUgx3LPUpf/preview")}> <MdHealthAndSafety className="icones_secretarias" /> <br/> Saúde</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1vZb5WRZhgCVFgTE8dRU21_J-LePNbRct/preview")}><MdOutlineSportsVolleyball className="icones_secretarias" /> <br/>  Sejuvel</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1W2u4i5XRwBPvTxN2D-6D5U1OVFE7Ou1m/preview")}><PiTrafficSign className="icones_secretarias" /> <br/>  Transporte</button>
         </div>
       </div>
 
