@@ -351,10 +351,10 @@ const opcoesLinha = {
               </div>
 
                <div className="infos_meta" >
-             <div className="descricao"  ><strong>Descrição:</strong> {meta.Plano === "Plano de Governo" ? meta.Objetivo : meta.Meta}</div>
+             <div className="descricao"  ><strong>Descrição:</strong> {meta.Plano === "Plano de Governo" || meta.Plano === "Plano Municipal da Primeira Infância" ? meta.Objetivo : meta.Meta}</div>
                
              <div style={{marginRight: "5px"}} ><strong>ODS Vinculados:</strong> {meta.ODS}</div>
-               <div><strong>Conclusão:</strong> {meta.Data_conclusão}</div>
+               <div><strong>Conclusão:</strong> {meta.Data_conclusao}</div>
                </div>
                 
                 <div style={{marginTop: "20px"}} ><strong>Secretaria:</strong> {meta.Secretaria}</div>
