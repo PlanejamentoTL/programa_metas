@@ -1,0 +1,84 @@
+// =====================================================================
+// SUGESTÃO de Security Rules para a página pública — NÃO foi publicada.
+// Aplique manualmente pelo Console do Firebase > Firestore > Regras,
+// mesclando com as regras atuais (as regras valem para o projeto inteiro).
+// =====================================================================
+//
+// SITUAÇÃO ATUAL (importante)
+// O sistema interno NÃO usa Firebase Auth (login local por lista de e-mails).
+// Para ele conseguir gravar, as regras precisam permitir escrita SEM
+// autenticação. Como a página pública expõe a configuração do Firebase no
+// navegador, isso significa que QUALQUER PESSOA pode alterar ou apagar as
+// metas. A página pública só lê, mas não impede que outros gravem.
+// Por isso NÃO use agora `allow write: if request.auth != null;`: isso
+// bloquearia as gravações do sistema interno até ele migrar para Firebase Auth.
+//
+// Se as regras atuais tiverem algo como
+//     match /{document=**} { allow read, write: if true; }
+// todo o banco (inclusive coleções que não são metas) está aberto para
+// leitura e escrita por qualquer pessoa.
+//
+// ATENÇÃO: com `allow read: if true`, qualquer campo criado no futuro nessas
+// coleções também ficará público.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Leitura pública das coleções exibidas na página ----
+    // Acrescente estes blocos dentro de `match /databases/{database}/documents`.
+    // `allow write` fica como está hoje no seu arquivo de regras (veja abaixo).
+
+    match /plano-governo/{doc}                 { allow read: if true; }
+    match /plano-plurianual/{doc}              { allow read: if true; }
+    match /ldo-2026/{doc}                      { allow read: if true; }
+    match /plano-diretor/{doc}                 { allow read: if true; }
+    match /plano-primeira-infancia/{doc}       { allow read: if true; }
+    match /plano-tres-lagoas-sustentavel/{doc} { allow read: if true; }
+    match /plano-setorial/{doc}                { allow read: if true; }
+
+    // ---- Escrita ----
+    // HOJE (sem Firebase Auth no sistema interno): mantenha a regra de
+    // escrita que já existe, senão o sistema interno para de gravar.
+    //
+    // DEPOIS que o sistema interno usar Firebase Auth, troque para:
+    //
+    //   match /plano-governo/{doc} {
+    //     allow read: if true;
+    //     allow write: if request.auth != null;
+    //   }
+    //   (e o mesmo para as outras seis coleções)
+    //
+    // Se o App Check for ativado e estiver em modo "aplicar" (enforce) para o
+    // Firestore, as requisições sem token válido serão recusadas, inclusive
+    // as do sistema interno se ele não tiver App Check configurado.
+  }
+}
+
+// =====================================================================
+// COMO MESCLAR
+// 1. Console do Firebase > Firestore Database > aba "Regras".
+// 2. Copie as regras atuais para um arquivo de backup antes de mexer.
+// 3. Dentro de `match /databases/{database}/documents { ... }`, acrescente
+//    os sete blocos `match /<colecao>/{doc} { allow read: if true; }`.
+//    - Se já existir um `match` para a mesma coleção, apenas inclua
+//      `allow read: if true;` dentro dele.
+//    - As regras do Firestore se somam (OR): basta uma regra permitir.
+// 4. Use o "Playground de regras" (simulador) para testar:
+//    leitura não autenticada em /plano-governo/qualquer → deve PERMITIR;
+//    leitura em /base-teste/qualquer → depende das suas regras atuais.
+// 5. Publique.
+//
+// APP CHECK (opcional, preparado e desligado no código)
+// 1. Console do Google Cloud / reCAPTCHA: crie uma chave reCAPTCHA v3
+//    (ou Enterprise) para o domínio do site (ex.: planejamentotl.github.io
+//    e o domínio da prefeitura).
+// 2. Console do Firebase > App Check > Apps > "Página pública": registre
+//    o provedor reCAPTCHA com a chave secreta.
+// 3. No .env: VITE_APP_CHECK_ATIVO=true, VITE_RECAPTCHA_SITE_KEY=<chave do site>
+//    e VITE_RECAPTCHA_TIPO=v3 (ou enterprise). Gere novo build e publique.
+// 4. Acompanhe as métricas de App Check por alguns dias em modo
+//    "não aplicado". Só clique em "Aplicar" (enforce) para o Firestore depois
+//    que o sistema interno também enviar tokens de App Check, ou ele será
+//    bloqueado.
+// =====================================================================

@@ -1,0 +1,57 @@
+.evolucao-card {
+  margin: 0 20px;
+  padding: 1rem;
+  background: #fff;
+  color: #000;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.evolucao-card h4 {
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+.grafico-evolucao {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  margin: 0;
+}
+
+.grafico-evolucao-vazio {
+  text-align: center;
+  color: #555;
+}
+
+.grafico-evolucao-tabela {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.grafico-evolucao-tabela summary {
+  cursor: pointer;
+  color: #1641a2;
+}
+
+.grafico-evolucao-rolagem {
+  overflow-x: auto;
+}
+
+.grafico-evolucao-tabela table {
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.grafico-evolucao-tabela th,
+.grafico-evolucao-tabela td {
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .grafico-evolucao { height: 260px; }
+}

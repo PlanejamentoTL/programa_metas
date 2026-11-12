@@ -1,0 +1,199 @@
+/* ===== Modal de meta (somente leitura) — réplica do visual do monitoramento =====
+   Valores copiados de modais-css.md (seção 4). Não alterar sem comparar com o monitoramento. */
+.mm-overlay {
+  --mm-azul: #007BFF;
+  --mm-azul-claro: #d6e4ff;
+  --mm-caixa: #FDF2F2;
+  --mm-texto: #121212;
+  --mm-texto-suave: #555;
+  --mm-vermelho: #dc3545;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, .45);
+  display: grid;
+  place-items: center;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+.mm-overlay *, .mm-overlay *::before, .mm-overlay *::after { box-sizing: border-box; }
+
+.mm-modal {
+  width: min(960px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: var(--mm-texto);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+  outline: none;
+}
+
+/* Cabeçalho fixo */
+.mm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+.mm-header h2 { margin: 0; font-size: 1.5em; font-weight: 700; }
+
+.mm-fechar {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10%;
+  background: var(--mm-vermelho);
+  color: #fff;
+  font-size: larger;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.mm-fechar:focus-visible { outline: 3px solid #000; outline-offset: 2px; }
+
+/* Conteúdo rolável */
+.mm-conteudo { padding: 14px 18px; overflow: auto; }
+
+/* Títulos de seção (h2 preto, como no monitoramento) */
+.mm-secao { margin: 16px 0 4px; font-size: 1.5em; font-weight: 700; }
+
+/* ---------- Bloco azul de destaque ---------- */
+.mm-destaque {
+  background: var(--mm-azul);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 12px 0;
+}
+.mm-destaque .mm-secao { margin-top: 0; color: #fff; }
+.mm-destaque--compacto { font-size: 13px; }
+
+.mm-titulo-meta { display: flex; align-items: center; gap: 1rem; }
+.mm-numero, .mm-separador { font-size: 2em; font-weight: 700; line-height: 1.2; }
+.mm-titulo-meta h3 { margin: 0; font-size: 1.17em; font-weight: 700; }
+
+.mm-info { margin: 10px 0; }
+.mm-info h4 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+.mm-info p { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+
+/* ---------- Campos (rótulo + caixa) ---------- */
+.mm-linha { display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap; }
+.mm-linha > * { flex: 1 1 200px; }
+
+.mm-grade {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 1rem;
+}
+.mm-campo { margin: 10px 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mm-campo--largo { grid-column: 1 / -1; }
+
+.mm-rotulo { font-weight: 400; }          /* no monitoramento os rótulos são normais… */
+.mm-campo--largo > .mm-rotulo { font-weight: 700; } /* …e os de texto longo, em negrito */
+
+.mm-valor {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  background: var(--mm-caixa);
+  color: var(--mm-texto);
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.mm-valor--longo { display: block; min-height: 60px; white-space: pre-line; }
+
+/* Caixas de status: texto sempre escuro */
+.mm-status[data-status="Concluída"]       { background: rgba(0, 226, 0, 0.7); }
+.mm-status[data-status="Em Partes"]       { background: rgba(0, 96, 163, 0.7); }
+.mm-status[data-status="Planejada"]       { background: rgba(255, 255, 0, 0.7); }
+.mm-status[data-status="Não Contemplada"] { background: rgba(232, 36, 36, 0.7); }
+
+/* ---------- Etapas ---------- */
+.mm-etapas { margin: 12px 0; }
+.mm-etapas-cabecalho { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.mm-porcentagem { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+.mm-porcentagem strong { font-size: 24px; font-weight: 700; color: var(--mm-azul); }
+.mm-porcentagem small { font-size: 12px; color: var(--mm-texto-suave); }
+
+.mm-etapa {
+  border: 1px solid var(--mm-azul-claro);
+  border-left: 5px solid var(--mm-azul);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  background: #fff;
+}
+.mm-etapa-titulo { margin: 0 0 8px; font-size: 1.17em; font-weight: 700; color: var(--mm-azul); }
+.mm-etapa-campos {
+  display: grid;
+  grid-template-columns: 3fr 0.7fr 1.3fr 1.5fr;
+  gap: 1rem;
+  align-items: start;
+}
+.mm-etapa-campo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mm-etapa-campo > .mm-rotulo { font-weight: 700; }
+.mm-etapa-peso > span:last-child { font-size: 18px; font-weight: 700; }
+.mm-texto { white-space: pre-line; overflow-wrap: anywhere; }
+
+/* ---------- Documento ---------- */
+.mm-documento { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.mm-btn-documento {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 7px;
+  background: var(--mm-azul);
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+/* `color: #fff` no hover: impede o `a:hover` global (index.css) de mudar a cor do texto */
+.mm-btn-documento:hover { filter: brightness(.92); color: #fff; }
+.mm-btn-documento[aria-disabled="true"] {
+  background: #c9c9c9;
+  color: #6b6b6b;
+  cursor: not-allowed;
+  filter: none;
+}
+.mm-doc-icone { font-size: 26px; display: inline-flex; }
+.mm-doc-icone--ok { color: #2e9e44; }
+.mm-doc-icone--alerta { color: #e08a00; }
+.mm-doc-aviso { display: block; margin-top: 6px; color: #b36b00; }
+
+/* ---------- Rodapé ---------- */
+.mm-rodape {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .mm-grade { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .mm-etapa-campos { grid-template-columns: 1fr; }
+  .mm-porcentagem strong { font-size: 20px; }
+}
+@media (max-width: 480px) {
+  .mm-overlay { place-items: stretch; }
+  .mm-modal { width: 100vw; max-height: 100dvh; border-radius: 0; }
+  .mm-grade { grid-template-columns: 1fr; }
+  .mm-numero, .mm-separador { font-size: 1.5em; }
+  .mm-btn-documento { white-space: normal; height: auto; min-height: 40px; padding: 8px 14px; }
+}

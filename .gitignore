@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variáveis de ambiente (configuração do Firebase)
+.env
+.env.*
+!.env.example

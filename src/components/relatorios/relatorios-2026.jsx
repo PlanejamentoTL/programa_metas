@@ -45,17 +45,32 @@ const relatorios2Semestre = [
 function GrupoRelatorios({ itens }) {
   return (
     <div className="relatorios">
-      {itens.map(({ label, icon: Icon, url }) => (
-        <button
-          key={label}
-          className="botoes_relatorios"
-          onClick={() => window.open(url)}
-        >
-          <Icon className="icones_secretarias" />
-          <br />
-          {label}
-        </button>
-      ))}
+      {itens.map(({ label, icon: Icon, url }) => {
+        const isDesabilitado = !url; // Verifica se a URL está vazia
+
+        return (
+          <button
+            key={label}
+            className="botoes_relatorios"
+            // Desabilita o botão se não houver URL
+            disabled={isDesabilitado} 
+            // Aplica opacidade inline apenas se estiver desabilitado
+            style={{ 
+              opacity: isDesabilitado ? 0.5 : 1, 
+              cursor: isDesabilitado ? "not-allowed" : "pointer" 
+            }}
+            onClick={() => {
+              if (url) {
+                window.open(url);
+              }
+            }}
+          >
+            <Icon className="icones_secretarias" />
+            <br />
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -74,7 +89,7 @@ export default function Relatorios2026() {
       <GrupoRelatorios itens={relatorios1Semestre} />
 
       <h2>Relatórios 2º Semestre</h2>
-      <GrupoRelatorios itens={relatorios2Semestre} />
+      <GrupoRelatorios  itens={relatorios2Semestre} />
 
     </div>
   );

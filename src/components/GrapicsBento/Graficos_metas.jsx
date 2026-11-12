@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Papa from "papaparse";
+import { SEMESTRE_ATUAL, SECRETARIAS, URL_FINANCEIRO, PLANOS } from "../../config/dados";
+import GraficoEvolucaoStatus from "../GraficoEvolucao/GraficoEvolucaoStatus";
+import ModalMeta from "../ModalMeta/ModalMeta";
+import { carregarMetas } from "../../services/metas";
+import { statusDe, texto, formatarData, formatarDataHora } from "../../utils/formatacao";
 import { Doughnut, Line, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -30,66 +35,76 @@ ChartJS.register(
   ChartDataLabels 
 );
 
-// 1. MAPEAMENTO DAS PLANILHAS POR PLANO
-// Substitua os textos "LINK_DA_SUA_PLANILHA_..." pelas URLs de exportação em CSV correspondentes
-const PLANOS_URLS = {
-  "Plano de Governo": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTvcH-qqxmW59c00lhrbKJ34PeWFDlYbZy6_jX5sQfBMQqNqLa9VhM_DEE3zOTj0-4x5ztA12kexRaP/pub?gid=882151214&single=true&output=csv",
-  "Plano Plurianual": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_6zW5DYxtW4eQTr5R0Pslkjb0yUS7TijBbmaBVrKKTbGF27sz4tAMI7I94I5422mOVEQtPo_SVKF7/pub?gid=733785812&single=true&output=csv",
-  "Lei de Diretrizes Orçamentárias": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFqdSZQLuiarzUlIFqh22Twt0LziRaVc8TCtiuu1MBCOqTda6gydL4ETaJb8fP1bE3l-aF3VBaw1wc/pub?gid=135014434&single=true&output=csv",
-  "Plano Diretor": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHnNYVGyhxRn_fx_SjJD5u1lrdqzlI_fQTYEs6Y9NrXypv41gRPKNGPli4xFep8FHFTgWnIf8sxxMo/pub?gid=199012838&single=true&output=csv",
-  "Plano Municipal da Primeira Infância": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRES7Pt9rFBP-zZc1DNercXhKxWx_Jcr5luCmNJlO9GD3P7Saoy-nnh7AYZemm_ikR5HwVyLTEQbWSk/pub?gid=557101530&single=true&output=csv",
-  "Plano Três Lagoas Sustentável": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTzFNCGHooPZq_3AtplFbdSfI1D_mXW9Yg5rHyJXLKZGcD_OOYYRvCiz49S3Y3ciQx2mIX7A643Rz0s/pub?gid=652555452&single=true&output=csv",
-  "Plano Setorial": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRsmkKBcNC4O6CkL-ZpASqPhw86arDdFsXKtmFYb1orGCj5QIjMdQWBoGmy5qce3BhQETRooV7liqT7/pub?gid=1737868640&single=true&output=csv"
-};
+// Fonte das metas, semestre exibido e planilhas: ver src/config/dados.js
+const PLANO_GOVERNO = "Plano de Governo";
 
-const url_financeiro = 
-   "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqIsZ9Y0T__qRR4h6k3q6m1B_D6By0MO49t3pBs7vwaUs2wbNljsxMmxQ_TwWGJQB0g8L81ZhTRljD/pub?gid=440817858&single=true&output=csv";
+// Verifica se a secretaria de um registro corresponde à opção do filtro
+// (aceita as grafias antigas das planilhas listadas em `aliases`).
+function secretariaCorresponde(valor, filtro) {
+  if (filtro === "Todos") return true;
+  const v = String(valor ?? "").trim();
+  if (v === filtro) return true;
+  const opcao = SECRETARIAS.find((s) => s.sigla === filtro);
+  return Boolean(opcao?.aliases?.includes(v));
+}
+
+function OpcoesSecretarias() {
+  return (
+    <>
+      <option value="Todos">Todos</option>
+      {SECRETARIAS.map((s) => (
+        <option key={s.sigla} value={s.sigla}>{s.nome}</option>
+      ))}
+    </>
+  );
+}
 
 function TabelaEGrafico() {
   const [dados, setDados] = useState([]);
   const [dados_financeiros, setDados_financeiros] = useState([]);
   const [filtroSecretaria, setFiltroSecretaria] = useState("Todos");
-  const [filtroPlano, setFiltroPlano] = useState("Plano de Governo");
+  const [filtroPlano, setFiltroPlano] = useState(PLANO_GOVERNO);
   const [linhaAberta, setLinhaAberta] = useState(null);
   const [filtroTipo, setFiltroTipo] = useState("Geral");
-  const [carregandoDados, setCarregandoDados] = useState(false); // Bom para indicar o carregamento ao usuário
+  const [carregandoDados, setCarregandoDados] = useState(false);
+  const [erroDados, setErroDados] = useState(false);
+  const [atualizadoEm, setAtualizadoEm] = useState(null);
+  const [desatualizado, setDesatualizado] = useState(false);
+  const [metaAberta, setMetaAberta] = useState(null);
+  const fecharModal = useCallback(() => setMetaAberta(null), []);
 
-  // 2. USEEFFECT DINÂMICO PARA OS PLANOS
   useEffect(() => {
-    const urlAtiva = PLANOS_URLS[filtroPlano];
-
-    if (!urlAtiva) {
-      console.warn(`URL não encontrada para o plano: ${filtroPlano}`);
-      return;
-    }
+    let cancelado = false; // ignora respostas de um plano que já não está selecionado
 
     setCarregandoDados(true);
+    setErroDados(false);
 
-    fetch(urlAtiva)
-      .then((response) => response.text())
-      .then((data) => {
-        const parse_data = Papa.parse(data, { header: true }).data;
-        
-        // Normalização: se a planilha do plano X não tiver uma coluna "Plano",
-        // nós injetamos o nome do filtro nela para manter seus filtros de renderização funcionando!
-        const dadosNormalizados = parse_data.map(item => ({
-          ...item,
-          Plano: item.Plano || filtroPlano
-        }));
-
-        setDados(dadosNormalizados);
-        setCarregandoDados(false);
+    carregarMetas(filtroPlano)
+      .then((resultado) => {
+        if (cancelado) return;
+        setDados(resultado.metas);
+        setAtualizadoEm(resultado.atualizadoEm);
+        setDesatualizado(resultado.desatualizado);
       })
       .catch((error) => {
-        console.error("Erro ao buscar dados da planilha:", error);
-        setCarregandoDados(false);
+        if (cancelado) return;
+        console.error("Erro ao carregar as metas:", error);
+        setDados([]);
+        setAtualizadoEm(null);
+        setErroDados(true);
+      })
+      .finally(() => {
+        if (!cancelado) setCarregandoDados(false);
       });
-  }, [filtroPlano]); // IMPORTANTE: O React vai rodar esse efeito toda vez que "filtroPlano" mudar!
+
+    return () => {
+      cancelado = true;
+    };
+  }, [filtroPlano]);
 
 
-  // O resto do seu useEffect de dados financeiros continua igual
   useEffect(() => {
-    fetch(url_financeiro)
+    fetch(URL_FINANCEIRO)
       .then((response) => response.text())
       .then((data) => {
         const parse_data2 = Papa.parse(data, { header: true }).data;
@@ -99,8 +114,11 @@ function TabelaEGrafico() {
 
   const anosFixos = ["2021", "2022", "2023", "2024", "2025", "2026"];
 
+  const campoStatus = `status-${SEMESTRE_ATUAL}`;
+
   const dadosFiltrados = dados.filter(item => {
-    const bySecretaria = filtroSecretaria === "Todos" || item.Secretaria === filtroSecretaria;
+    const secretariaItem = item["secretaria-responsavel"] || item.Secretaria;
+    const bySecretaria = secretariaCorresponde(secretariaItem, filtroSecretaria);
     const byPlano = filtroPlano === "Todos" || item.Plano === filtroPlano;
     return bySecretaria && byPlano;
   });
@@ -114,15 +132,15 @@ function TabelaEGrafico() {
   };
 
   dadosFiltrados.forEach((item) => {
-    let status = item["status-2026-1"]?.trim().toLowerCase();
+    // Rótulos do gráfico mantidos como antes ("Em partes", "Não contemplada")
     const mapaStatus = {
-      "concluída": "Concluída",
-      "em partes": "Em partes",
-      "planejada": "Planejada",
-      "não contemplada": "Não contemplada",
-      "sem dados": "Sem dados"
+      "Concluída": "Concluída",
+      "Em Partes": "Em partes",
+      "Planejada": "Planejada",
+      "Não Contemplada": "Não contemplada",
     };
-    status = mapaStatus[status] || "Outro";
+    let status = mapaStatus[statusDe(item, campoStatus)];
+    if (!status) status = texto(item, campoStatus).toLowerCase() === "sem dados" ? "Sem dados" : "Outro";
     if (status !== "Outro") {
       contagem[status] = (contagem[status] || 0) + 1;
       if (contadores.hasOwnProperty(status)) {
@@ -184,7 +202,8 @@ function TabelaEGrafico() {
 
   const dadosFinanceirosFiltrados = dados_financeiros.filter((d) => {
     const byTipo = filtroTipo === "Todos" || d.Tipo === filtroTipo;
-    const bySecretaria = filtroSecretaria === "Todos" || d.Secretaria === filtroSecretaria;
+    const secretariaItem = d["secretaria-responsavel"] || d.Secretaria;
+    const bySecretaria = secretariaCorresponde(secretariaItem, filtroSecretaria);
     return byTipo && bySecretaria;
   });
 
@@ -237,7 +256,11 @@ function TabelaEGrafico() {
     },
   };
 
-  const secretarias = Array.from(new Set(dados.map(d => d.Secretaria).filter(Boolean)));
+  // CORREÇÃO: Mapeando a lista de secretarias únicas das metas usando 'secretaria-responsavel'
+  const secretarias = Array.from(
+    new Set(dados.map(d => d["secretaria-responsavel"] || d.Secretaria).filter(Boolean))
+  );
+
   const toggleLinha = (index) => {
     setLinhaAberta(linhaAberta === index ? null : index);
   };
@@ -254,18 +277,16 @@ function TabelaEGrafico() {
             Filtrar por Secretaria:
             <br/>
             <select className="filtros" value={filtroSecretaria} onChange={e => setFiltroSecretaria(e.target.value)}>
-              <option value="Todos">Todos</option>
-              {secretarias.map((s, i) => <option key={i} value={s}>{s}</option>)}
+              <OpcoesSecretarias />
             </select>
           </label>
           <label>
             Filtrar por Plano:
             <br/>
-            {/* O valor do select muda o estado filtroPlano, que dispara o fetch do useEffect */}
             <select className="filtros" value={filtroPlano} onChange={e => setFiltroPlano(e.target.value)}>
               <option value="Plano de Governo">Plano de Governo</option>
               <option value="Plano Plurianual">Plano Plurianual</option>
-              <option value="Lei de Diretrizes Orçamentárias">Lei de Diretrizes Orçamentárias</option>
+              <option value="LDO">Lei de Diretrizes Orçamentárias</option>
               <option value="Plano Diretor">Plano Diretor</option>
               <option value="Plano Municipal da Primeira Infância">Plano Municipal da Primeira Infância</option>
               <option value="Plano Três Lagoas Sustentável">Plano Três Lagoas Sustentável</option>
@@ -274,86 +295,110 @@ function TabelaEGrafico() {
           </label>
         </div>
 
-        {/* FEEDBACK VISUAL DE CARREGAMENTO */}
-      
-          <>
-            <div id="indicadores" className="bento-grid">
-              <div className="bento-card" style={{ gridArea: "box-1" }}>
-                <div className="grafico-status">
-                  {chartDataObj.labels.length > 0 ? <Doughnut data={chartDataObj} options={options_porcentagem} /> : <p>Nenhum dado disponível</p>}
-                </div>
-              </div>
-
-              <div className="bento-card" style={{ gridArea: "box-2" }}>
-                <h4 className="contador_titulo">Total de Metas</h4>
-                <p className="contador">{dadosFiltrados.length}</p>
-              </div>
-
-              <div className="bento-card" style={{ gridArea: "box-3" }}>
-                <h4 className="contador_titulo">Concluídas</h4>
-                <p className="contador">{contadores["Concluída"]}</p>
-              </div>
-
-              <div className="bento-card" style={{ gridArea: "box-4" }}>
-                <h4 className="contador_titulo">Em Partes</h4>
-                <p className="contador">{contadores["Em partes"]}</p>
-              </div>
-
-              <div className="bento-card" style={{ gridArea: "box-5" }}>
-                <h4 className="contador_titulo">Planejadas</h4>
-                <p className="contador">{contadores["Planejada"]}</p>
-              </div>
-
-              <div className="bento-card" style={{ gridArea: "box-6" }}>
-                <h4 className="contador_titulo">Não contempladas</h4>
-                <p className="contador">{contadores["Não contemplada"]}</p>
+        <>
+          <div id="indicadores" className="bento-grid">
+            <div className="bento-card" style={{ gridArea: "box-1" }}>
+              <div className="grafico-status">
+                {chartDataObj.labels.length > 0 ? <Doughnut data={chartDataObj} options={options_porcentagem} /> : <p>Nenhum dado disponível</p>}
               </div>
             </div>
 
-            <div style={{ marginTop: "2rem", padding: "1rem" }}>
-              <h2 style={{ color: "#000" }}>Lista de Metas</h2>
-              <div className="listagem">
-                {dadosFiltrados.map((meta, i) => (
-                  <div key={i} className="unidade_lista" onClick={() => toggleLinha(i)}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <div><strong>Nº:</strong> {meta.numero}</div>
-                      <div className="status" style={{
-                        background: {
-                          "Concluída": "rgba(0, 226, 0, 0.7)",
-                          "Em Partes": "rgba(0, 96, 163, 0.7 )",
-                          "Planejada": "rgba(255, 255, 0, 0.7)",
-                          "Não contemplada": "rgba(232, 36, 36, 0.7 )",
-                          "Não Contemplada": "rgba(232, 36, 36, 0.7 )"
-                        }[meta["status-2026-1"]] || "#ccc",        
-                        padding: "8px",
-                        borderRadius: "5px",
-                        color: "#000",
-                      }}>
-                        <strong>Status:</strong> {meta["status-2026-1"]}
-                      </div>
-                    </div>
+            <div className="bento-card" style={{ gridArea: "box-2" }}>
+              <h4 className="contador_titulo">Total de Metas</h4>
+              <p className="contador">{dadosFiltrados.length}</p>
+            </div>
 
-                    <div className="infos_meta">
-                      <div className="descricao">
-                        <strong>Descrição:</strong> {meta.plano === "Plano de Governo" ? meta.objetivo : meta.meta}
-                      </div>
-                      <div style={{marginRight: "5px"}}><strong>ODS Vinculados:</strong> {meta["ods-vinculados"]}</div>
-                      <div><strong>Conclusão:</strong> {meta["data-conclusao"]}</div>
-                    </div>
-                    
-                    <div style={{marginTop: "20px"}}><strong>Secretaria:</strong> {meta["secretaria-responsavel"]}</div>
+            <div className="bento-card" style={{ gridArea: "box-3" }}>
+              <h4 className="contador_titulo">Concluídas</h4>
+              <p className="contador">{contadores["Concluída"]}</p>
+            </div>
 
-                    {linhaAberta === i && (
-                      <div style={{ marginTop: "10px", background: "#f4f4f4", padding: "10px", borderRadius: "4px" }}>
-                        <strong>Detalhamento:</strong> {meta.plano !== "Plano de Governo" ? meta.detalhamento : meta.meta}
-                      </div>
-                    )}
+            <div className="bento-card" style={{ gridArea: "box-4" }}>
+              <h4 className="contador_titulo">Em Partes</h4>
+              <p className="contador">{contadores["Em partes"]}</p>
+            </div>
+
+            <div className="bento-card" style={{ gridArea: "box-5" }}>
+              <h4 className="contador_titulo">Planejadas</h4>
+              <p className="contador">{contadores["Planejada"]}</p>
+            </div>
+
+            <div className="bento-card" style={{ gridArea: "box-6" }}>
+              <h4 className="contador_titulo">Não contempladas</h4>
+              <p className="contador">{contadores["Não contemplada"]}</p>
+            </div>
+          </div>
+
+          <div className="evolucao-card">
+            <h4>Evolução dos status por semestre</h4>
+            <GraficoEvolucaoStatus metas={dadosFiltrados} />
+          </div>
+
+          <div style={{ marginTop: "2rem", padding: "1rem" }}>
+            <h2 style={{ color: "#000" }}>Lista de Metas</h2>
+            <p style={{ color: "#555", fontSize: "0.85rem", margin: "0 0 1rem" }}>
+              {carregandoDados
+                ? "Carregando dados..."
+                : erroDados
+                  ? "Não foi possível carregar os dados no momento. Tente novamente mais tarde."
+                  : atualizadoEm
+                    ? `Dados atualizados em ${formatarDataHora(new Date(atualizadoEm))}${desatualizado ? " (os dados podem estar desatualizados)" : ""}`
+                    : null}
+            </p>
+            <div className="listagem">
+              {dadosFiltrados.map((meta, i) => {
+                const status = statusDe(meta, campoStatus);
+                const ehPlanoGoverno = meta.Plano === PLANO_GOVERNO;
+                const abrir = () => setMetaAberta(meta);
+                return (
+                <div
+                  key={meta.id || i}
+                  className="unidade_lista"
+                  role="button"
+                  tabIndex={0}
+                  aria-haspopup="dialog"
+                  onClick={abrir}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      abrir();
+                    }
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <div><strong>Nº:</strong> {meta.numero}</div>
+                    <div className="status" style={{
+                      background: {
+                        "Concluída": "rgba(0, 226, 0, 0.7)",
+                        "Em Partes": "rgba(0, 96, 163, 0.7 )",
+                        "Planejada": "rgba(255, 255, 0, 0.7)",
+                        "Não Contemplada": "rgba(232, 36, 36, 0.7 )"
+                      }[status] || "#ccc",
+                      padding: "8px",
+                      borderRadius: "5px",
+                      color: "#000",
+                    }}>
+                      <strong>Status:</strong> {status}
+                    </div>
                   </div>
-                ))}
-              </div>
+
+                  <div className="infos_meta">
+                    <div className="descricao">
+                      <strong>Descrição:</strong> {ehPlanoGoverno ? texto(meta, "objetivo") : texto(meta, "meta")}
+                    </div>
+                    <div style={{marginRight: "5px"}}><strong>ODS Vinculados:</strong> {texto(meta, "ods-vinculados") || texto(meta, "ods-vinculado")}</div>
+                    <div><strong>Conclusão:</strong> {formatarData(meta["data-conclusao"])}</div>
+                  </div>
+
+                  <div style={{marginTop: "20px"}}><strong>Secretaria:</strong> {texto(meta, "secretaria-responsavel")}</div>
+
+                </div>
+                );
+              })}
             </div>
-          </>
-  
+          </div>
+        </>
+ 
 
         {/* --- DADOS FINANCEIROS --- */}
         <div className="div_financeiro">
@@ -362,10 +407,7 @@ function TabelaEGrafico() {
               Filtrar p/ Secretaria:
               <br/>
               <select className="filtros" value={filtroSecretaria} onChange={e => setFiltroSecretaria(e.target.value)}>
-                <option value="Todos">Todos</option>
-                {Array.from(new Set(dados_financeiros.map(d => d.Secretaria).filter(Boolean))).map((s, i) => (
-                  <option key={i} value={s}>{s}</option>
-                ))}
+                <OpcoesSecretarias />
               </select>
             </label>
 
@@ -411,7 +453,8 @@ function TabelaEGrafico() {
                   <div><strong>Tipo:</strong> {item.Tipo}</div>
                 </div>
                 <div className="infos_meta">
-                  <div><strong>Secretaria:</strong> {item.Secretaria}</div>
+                  {/* CORREÇÃO: Lendo de forma segura para os dados financeiros */}
+                  <div><strong>Secretaria:</strong> {item["secretaria-responsavel"] || item.Secretaria}</div>
                   <div><strong>Dotação Inicial:</strong> R$ {item.Dotacao_Inicial}</div>
                   <div><strong>Dotação Final:</strong> R$ {item.Dotacao_Final}</div>
                 </div>
@@ -425,8 +468,8 @@ function TabelaEGrafico() {
           <div className="relatorios">
             <button className="botoes_relatorios" onClick={() => navigate("/relatorios-2025")}><IoDocumentSharp className="icones_secretarias" /> <br/> 2025</button>
             <button className="botoes_relatorios" onClick={() => navigate("/relatorios-2026")}><IoDocumentSharp className="icones_secretarias" /> <br/> 2026</button>
-            <button className="botoes_relatorios"><IoDocumentSharp className="icones_secretarias" /> <br/> 2027</button>
-            <button className="botoes_relatorios"><IoDocumentSharp className="icones_secretarias" /> <br/> 2028</button>
+            <button className="botoes_relatorios" style={{opacity: "50%"}}><IoDocumentSharp className="icones_secretarias" /> <br/> 2027</button>
+            <button className="botoes_relatorios" style={{opacity: "50%"}}><IoDocumentSharp className="icones_secretarias" /> <br/> 2028</button>
           </div>
         </div>
 
@@ -434,19 +477,25 @@ function TabelaEGrafico() {
           <h2>Instrumentos de Planejamento</h2>
           <div className="relatorios">
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1Dxx0vTkMO2zWpNIJDbdtgYGil5VpDWok/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano de Governo</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/18UHUPyS0VLzoeZUI7JlOdSuvwrSEKY48/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano Plurianual</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1kWchwe_s_gjjTaRoxgZx8UWvZCt12gBB/view")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano Plurianual</button>
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/10igvaiyBnXKwflsXiDz46XCCNBtluNUc/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano Diretor</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1F9YYY1EqJJ6GTWantZFuTyKxAdGIbNJ-/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> LDO 2025</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1zPmJkUnBHn8WZE4LYhuihdDJUDxgPP2y/view")}><IoDocumentSharp className="icones_secretarias" /> <br/> LDO 2026</button>
           </div>
           <div className="relatorios">
             <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1IwSHjBiYK6mPeTQqPCLKjovbjIC42OXd/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano Três Lagoas Sustentável</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1BbuQfYBInMoXSbcS5V9QJAF7KgJb4td_/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano de Capacitação</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1HlgOdJiX8m4iM_xnGhmzWAYjMiMW9X3J/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano de Gestão de Risco</button>
-            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1XvuVONLwJZdiBSkYHfVvHgtC3hkiMVp-/preview")}><IoDocumentSharp className="icones_secretarias" /> <br/> Planejamento Estratégico</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1BbuQfYBInMoXSbcS5V9QJAF7KgJb4td_/view")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano de Capacitação</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1HlgOdJiX8m4iM_xnGhmzWAYjMiMW9X3J/view")}><IoDocumentSharp className="icones_secretarias" /> <br/> Plano de Gestão de Risco</button>
+            <button className="botoes_relatorios" onClick={() => window.open("https://drive.google.com/file/d/1XvuVONLwJZdiBSkYHfVvHgtC3hkiMVp-/view")}><IoDocumentSharp className="icones_secretarias" /> <br/> Planejamento Estratégico</button>
           </div>
         </div>
 
       </div>
+
+      <ModalMeta
+        colecao={metaAberta ? PLANOS[metaAberta.Plano]?.colecao : null}
+        meta={metaAberta}
+        onClose={fecharModal}
+      />
 
       <footer className="rodape">
         <p>&copy; {new Date().getFullYear()} Prefeitura Municipal de Três Lagoas. Todos os direitos reservados.</p>
